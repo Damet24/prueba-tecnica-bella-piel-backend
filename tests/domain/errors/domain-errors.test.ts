@@ -4,7 +4,7 @@ import {
   InvalidTaskStatusError,
   TaskValidationError,
   DomainError,
-} from '../index';
+} from '../../../src/domain/errors';
 
 describe('Domain Errors', () => {
   it('TaskNotFoundError has correct code and message', () => {

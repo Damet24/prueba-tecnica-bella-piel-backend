@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TaskService } from '../task.service';
-import { TaskRepository } from '../../domain/repositories/task.repository';
-import { Task } from '../../domain/task.entity';
+import { TaskService } from '../../src/services/task.service';
+import { TaskRepository } from '../../src/domain/repositories/task.repository';
+import { Task } from '../../src/domain/task.entity';
 import {
   TaskNotFoundError,
   InvalidTaskStatusError,
   TaskValidationError,
-} from '../../domain/errors';
+} from '../../src/domain/errors';
 
 const mockTask: Task = {
   id: '550e8400-e29b-41d4-a716-446655440000',
@@ -66,8 +66,6 @@ describe('TaskService', () => {
   });
 
   describe('create', () => {
-    const validInput = { titulo: 'New task', descripcion: 'Desc' };
-
     it('creates task with default estado pendiente', async () => {
       vi.mocked(repo.create!).mockResolvedValue(mockTask);
 
