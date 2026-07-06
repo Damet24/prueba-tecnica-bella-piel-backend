@@ -18,6 +18,10 @@ interface EnvConfig {
     version: string;
     basePath: string;
   };
+  swagger: {
+    enabled: boolean;
+    path: string;
+  };
 }
 
 export function loadEnv(): EnvConfig {
@@ -45,6 +49,10 @@ export function loadEnv(): EnvConfig {
     api: {
       version: apiVersion,
       basePath: `/api/${apiVersion}`,
+    },
+    swagger: {
+      enabled: nodeEnv === 'development',
+      path: '/api-docs',
     },
   };
 }

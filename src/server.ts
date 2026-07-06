@@ -3,8 +3,11 @@ import helmet from 'helmet';
 import cors from 'cors';
 import httpStatus from 'http-status';
 import http from 'node:http';
+import swaggerUi from 'swagger-ui-express';
 import { register } from './routes/task.routes';
 import { errorHandler } from './controllers/error-handler';
+import { swaggerSpec } from './config/swagger';
+import { env } from './config/env.config';
 import logger from './config/logger';
 
 export class Server {
@@ -22,6 +25,15 @@ export class Server {
     this.express.use(helmet.hidePoweredBy());
     this.express.use(helmet.frameguard({ action: 'deny' }));
     this.express.use(cors());
+
+    if (env.swagger.enabled) {
+      this.express.use(env.swagger.path, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+      this.express.get(`${env.swagger.path}.json`, (req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(swaggerSpec);
+      });
+      logger.info(`Swagger docs available at http://localhost:${this.port}${env.swagger.path}`);
+    }
 
     const router = Router();
     register(router);
