@@ -20,7 +20,7 @@ interface EnvConfig {
   };
 }
 
-function loadEnv(): EnvConfig {
+export function loadEnv(): EnvConfig {
   const nodeEnv = process.env.NODE_ENV || 'development';
   const port = Number(process.env.PORT) || 3000;
   const dbHost = process.env.DB_HOST || 'localhost';
@@ -29,10 +29,6 @@ function loadEnv(): EnvConfig {
   const dbPassword = process.env.DB_PASSWORD || 'root';
   const dbName = process.env.DB_NAME || 'task_manager';
   const apiVersion = process.env.API_VERSION || 'v1';
-
-  if (!dbHost || !dbUser || !dbName) {
-    throw new Error('Missing required environment variables');
-  }
 
   return {
     nodeEnv,
