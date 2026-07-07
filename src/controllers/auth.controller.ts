@@ -33,4 +33,23 @@ export class AuthController {
       next(error);
     }
   };
+
+  updateProfile = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const user = await this.service.updateProfile(req.userId as number, req.body);
+      res.status(httpStatus.OK).json(user);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updatePassword = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      await this.service.updatePassword(req.userId as number, currentPassword, newPassword);
+      res.status(httpStatus.NO_CONTENT).send();
+    } catch (error) {
+      next(error);
+    }
+  };
 }

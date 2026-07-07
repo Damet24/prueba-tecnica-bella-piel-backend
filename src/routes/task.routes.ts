@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { TaskController } from '../controllers/task.controller';
 import { TaskService } from '../services/task.service';
 import { MysqlTaskRepository } from '../infrastructure/repositories/mysql-task.repository';
+import { authenticate } from '../middleware/auth.middleware';
 import { env } from '../config/env.config';
 
 export function register(router: Router): void {
@@ -89,7 +90,7 @@ export function register(router: Router): void {
    *               items:
    *                 $ref: '#/components/schemas/Task'
    */
-  router.get(`${basePath}/tasks`, controller.getAll);
+  router.get(`${basePath}/tasks`, authenticate, controller.getAll);
 
   /**
    * @openapi
@@ -118,7 +119,7 @@ export function register(router: Router): void {
    *             schema:
    *               $ref: '#/components/schemas/ErrorResponse'
    */
-  router.get(`${basePath}/tasks/:id`, controller.getById);
+  router.get(`${basePath}/tasks/:id`, authenticate, controller.getById);
 
   /**
    * @openapi
@@ -146,7 +147,7 @@ export function register(router: Router): void {
    *             schema:
    *               $ref: '#/components/schemas/ErrorResponse'
    */
-  router.post(`${basePath}/tasks`, controller.create);
+  router.post(`${basePath}/tasks`, authenticate, controller.create);
 
   /**
    * @openapi
@@ -187,7 +188,7 @@ export function register(router: Router): void {
    *             schema:
    *               $ref: '#/components/schemas/ErrorResponse'
    */
-  router.put(`${basePath}/tasks/:id`, controller.update);
+  router.put(`${basePath}/tasks/:id`, authenticate, controller.update);
 
   /**
    * @openapi
@@ -212,5 +213,5 @@ export function register(router: Router): void {
    *             schema:
    *               $ref: '#/components/schemas/ErrorResponse'
    */
-  router.delete(`${basePath}/tasks/:id`, controller.delete);
+  router.delete(`${basePath}/tasks/:id`, authenticate, controller.delete);
 }

@@ -15,4 +15,6 @@ export function register(router: Router): void {
   router.post(`${basePath}/auth/register`, controller.register);
   router.post(`${basePath}/auth/login`, controller.login);
   router.get(`${basePath}/auth/me`, authenticate, controller.me);
+  router.put(`${basePath}/auth/profile`, authenticate, controller.updateProfile);
+  router.put(`${basePath}/auth/password`, authenticate, controller.updatePassword);
 }

@@ -7,8 +7,8 @@ const VALID_STATUSES: Task['estado'][] = ['pendiente', 'en progreso', 'completad
 export class TaskService {
   constructor(private readonly repository: TaskRepository) {}
 
-  async getAll(): Promise<Task[]> {
-    return this.repository.findAll();
+  async getAll(userId: number): Promise<Task[]> {
+    return this.repository.findAll(userId);
   }
 
   async getById(id: string): Promise<Task> {
@@ -17,7 +17,7 @@ export class TaskService {
     return task;
   }
 
-  async create(data: { titulo: string; descripcion?: string; estado?: string }): Promise<Task> {
+  async create(data: { titulo: string; descripcion?: string; estado?: string; user_id: number }): Promise<Task> {
     if (!data.titulo || data.titulo.trim().length === 0) {
       throw new TaskValidationError('Title is required');
     }
@@ -31,6 +31,7 @@ export class TaskService {
       titulo: data.titulo.trim(),
       descripcion: data.descripcion?.trim(),
       estado: estado as Task['estado'],
+      user_id: data.user_id,
     });
   }
 

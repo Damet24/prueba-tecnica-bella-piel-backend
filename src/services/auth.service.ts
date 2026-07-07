@@ -42,6 +42,34 @@ export class AuthService {
     return this.toPublicUser(user);
   }
 
+  async updateProfile(userId: number, data: { nombre?: string; email?: string }): Promise<PublicUser> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) throw new InvalidCredentialsError();
+
+    if (data.email && data.email !== user.email) {
+      const emailTaken = await this.userRepository.findByEmail(data.email);
+      if (emailTaken) throw new EmailAlreadyExistsError(data.email);
+    }
+
+    const updateData: Partial<User> = {};
+    if (data.nombre !== undefined) updateData.nombre = data.nombre;
+    if (data.email !== undefined) updateData.email = data.email;
+
+    const updated = await this.userRepository.update(userId, updateData);
+    return this.toPublicUser(updated as User);
+  }
+
+  async updatePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) throw new InvalidCredentialsError();
+
+    const valid = await bcrypt.compare(currentPassword, user.password);
+    if (!valid) throw new InvalidCredentialsError();
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.userRepository.update(userId, { password: hashedPassword });
+  }
+
   private toPublicUser(user: User): PublicUser {
     const { password: _, ...publicUser } = user;
     return publicUser;

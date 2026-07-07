@@ -24,6 +24,11 @@ describe('loadEnv', () => {
     expect(config.db.name).toBe('task_manager');
     expect(config.api.version).toBe('v1');
     expect(config.api.basePath).toBe('/api/v1');
+    expect(config.jwt.secret).toBe('super-secret-key-change-in-production');
+    expect(config.jwt.expiresIn).toBe('24h');
+    expect(config.defaultAdmin.email).toBe('admin@taskmanager.com');
+    expect(config.defaultAdmin.password).toBe('Admin123!');
+    expect(config.defaultAdmin.nombre).toBe('Administrador');
   });
 
   it('reads values from environment variables', () => {
@@ -35,6 +40,11 @@ describe('loadEnv', () => {
     process.env.DB_PASSWORD = 'secret';
     process.env.DB_NAME = 'prod_db';
     process.env.API_VERSION = 'v2';
+    process.env.JWT_SECRET = 'my-custom-secret';
+    process.env.JWT_EXPIRES_IN = '12h';
+    process.env.DEFAULT_ADMIN_EMAIL = 'custom@admin.com';
+    process.env.DEFAULT_ADMIN_PASSWORD = 'CustomPass123!';
+    process.env.DEFAULT_ADMIN_NOMBRE = 'Custom Admin';
 
     const config = loadEnv();
 
@@ -49,6 +59,11 @@ describe('loadEnv', () => {
     expect(config.db.name).toBe('prod_db');
     expect(config.api.version).toBe('v2');
     expect(config.api.basePath).toBe('/api/v2');
+    expect(config.jwt.secret).toBe('my-custom-secret');
+    expect(config.jwt.expiresIn).toBe('12h');
+    expect(config.defaultAdmin.email).toBe('custom@admin.com');
+    expect(config.defaultAdmin.password).toBe('CustomPass123!');
+    expect(config.defaultAdmin.nombre).toBe('Custom Admin');
   });
 
   it('coerces port to number', () => {

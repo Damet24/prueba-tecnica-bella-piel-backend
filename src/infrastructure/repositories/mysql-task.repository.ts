@@ -7,9 +7,10 @@ import { TaskRepository } from '../../domain/repositories/task.repository';
 interface TaskRow extends RowDataPacket, Task {}
 
 export class MysqlTaskRepository implements TaskRepository {
-  async findAll(): Promise<Task[]> {
+  async findAll(userId: number): Promise<Task[]> {
     const [rows] = await pool.query<TaskRow[]>(
-      'SELECT * FROM tasks WHERE fecha_eliminacion IS NULL ORDER BY fecha_creacion DESC',
+      'SELECT * FROM tasks WHERE user_id = ? AND fecha_eliminacion IS NULL ORDER BY fecha_creacion DESC',
+      [userId],
     );
     return rows;
   }
@@ -22,11 +23,11 @@ export class MysqlTaskRepository implements TaskRepository {
     return rows[0] || null;
   }
 
-  async create(task: Pick<Task, 'titulo' | 'descripcion' | 'estado'>): Promise<Task> {
+  async create(task: Pick<Task, 'titulo' | 'descripcion' | 'estado' | 'user_id'>): Promise<Task> {
     const id = randomUUID();
     await pool.query(
-      'INSERT INTO tasks (id, titulo, descripcion, estado) VALUES (?, ?, ?, ?)',
-      [id, task.titulo, task.descripcion, task.estado],
+      'INSERT INTO tasks (id, user_id, titulo, descripcion, estado) VALUES (?, ?, ?, ?, ?)',
+      [id, task.user_id, task.titulo, task.descripcion, task.estado],
     );
     return (await this.findById(id)) as Task;
   }

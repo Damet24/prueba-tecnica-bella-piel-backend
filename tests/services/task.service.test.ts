@@ -10,6 +10,7 @@ import {
 
 const mockTask: Task = {
   id: '550e8400-e29b-41d4-a716-446655440000',
+  user_id: 1,
   titulo: 'Test task',
   descripcion: 'A description',
   estado: 'pendiente',
@@ -37,13 +38,13 @@ describe('TaskService', () => {
   });
 
   describe('getAll', () => {
-    it('returns all tasks from repository', async () => {
+    it('returns tasks for the given user', async () => {
       vi.mocked(repo.findAll!).mockResolvedValue([mockTask]);
 
-      const result = await service.getAll();
+      const result = await service.getAll(1);
 
       expect(result).toEqual([mockTask]);
-      expect(repo.findAll).toHaveBeenCalledOnce();
+      expect(repo.findAll).toHaveBeenCalledWith(1);
     });
   });
 
@@ -69,46 +70,48 @@ describe('TaskService', () => {
     it('creates task with default estado pendiente', async () => {
       vi.mocked(repo.create!).mockResolvedValue(mockTask);
 
-      const result = await service.create({ titulo: 'Test task', descripcion: 'Desc' });
+      const result = await service.create({ titulo: 'Test task', descripcion: 'Desc', user_id: 1 });
 
       expect(result).toEqual(mockTask);
       expect(repo.create).toHaveBeenCalledWith({
         titulo: 'Test task',
         descripcion: 'Desc',
         estado: 'pendiente',
+        user_id: 1,
       });
     });
 
     it('uses provided estado when valid', async () => {
       vi.mocked(repo.create!).mockResolvedValue({ ...mockTask, estado: 'completada' });
 
-      const result = await service.create({ titulo: 'Test', estado: 'completada' });
+      const result = await service.create({ titulo: 'Test', estado: 'completada', user_id: 1 });
 
       expect(result.estado).toBe('completada');
       expect(repo.create).toHaveBeenCalledWith({
         titulo: 'Test',
         descripcion: undefined,
         estado: 'completada',
+        user_id: 1,
       });
     });
 
     it('throws InvalidTaskStatusError for invalid estado', async () => {
       await expect(
-        service.create({ titulo: 'Test', estado: 'invalid_status' }),
+        service.create({ titulo: 'Test', estado: 'invalid_status', user_id: 1 }),
       ).rejects.toThrow(InvalidTaskStatusError);
       expect(repo.create).not.toHaveBeenCalled();
     });
 
     it('throws TaskValidationError when titulo is empty', async () => {
       await expect(
-        service.create({ titulo: '' }),
+        service.create({ titulo: '', user_id: 1 }),
       ).rejects.toThrow(TaskValidationError);
       expect(repo.create).not.toHaveBeenCalled();
     });
 
     it('throws TaskValidationError when titulo is only whitespace', async () => {
       await expect(
-        service.create({ titulo: '   ' }),
+        service.create({ titulo: '   ', user_id: 1 }),
       ).rejects.toThrow(TaskValidationError);
       expect(repo.create).not.toHaveBeenCalled();
     });
@@ -116,7 +119,7 @@ describe('TaskService', () => {
     it('trims titulo before creating', async () => {
       vi.mocked(repo.create!).mockResolvedValue(mockTask);
 
-      await service.create({ titulo: '  My Task  ' });
+      await service.create({ titulo: '  My Task  ', user_id: 1 });
 
       expect(repo.create).toHaveBeenCalledWith(
         expect.objectContaining({ titulo: 'My Task' }),
@@ -126,7 +129,7 @@ describe('TaskService', () => {
     it('trims descripcion when provided', async () => {
       vi.mocked(repo.create!).mockResolvedValue(mockTask);
 
-      await service.create({ titulo: 'Task', descripcion: '  Desc  ' });
+      await service.create({ titulo: 'Task', descripcion: '  Desc  ', user_id: 1 });
 
       expect(repo.create).toHaveBeenCalledWith(
         expect.objectContaining({ descripcion: 'Desc' }),

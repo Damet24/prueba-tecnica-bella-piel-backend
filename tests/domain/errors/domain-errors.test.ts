@@ -3,6 +3,9 @@ import {
   TaskNotFoundError,
   InvalidTaskStatusError,
   TaskValidationError,
+  InvalidCredentialsError,
+  EmailAlreadyExistsError,
+  ForbiddenError,
   DomainError,
 } from '../../../src/domain/errors';
 
@@ -32,6 +35,36 @@ describe('Domain Errors', () => {
     expect(error).toBeInstanceOf(DomainError);
     expect(error.code).toBe('TASK_VALIDATION_ERROR');
     expect(error.message).toBe('Title is required');
+  });
+
+  it('InvalidCredentialsError has correct code and message', () => {
+    const error = new InvalidCredentialsError();
+
+    expect(error).toBeInstanceOf(DomainError);
+    expect(error.code).toBe('INVALID_CREDENTIALS');
+    expect(error.message).toBe('Invalid email or password');
+  });
+
+  it('EmailAlreadyExistsError has correct code and message', () => {
+    const error = new EmailAlreadyExistsError('test@test.com');
+
+    expect(error).toBeInstanceOf(DomainError);
+    expect(error.code).toBe('EMAIL_ALREADY_EXISTS');
+    expect(error.message).toBe('User with email test@test.com already exists');
+  });
+
+  it('ForbiddenError has correct code and default message', () => {
+    const error = new ForbiddenError();
+
+    expect(error).toBeInstanceOf(DomainError);
+    expect(error.code).toBe('FORBIDDEN');
+    expect(error.message).toBe('Access denied');
+  });
+
+  it('ForbiddenError accepts custom message', () => {
+    const error = new ForbiddenError('Admin access required');
+
+    expect(error.message).toBe('Admin access required');
   });
 
   it('DomainError sets name from constructor', () => {
