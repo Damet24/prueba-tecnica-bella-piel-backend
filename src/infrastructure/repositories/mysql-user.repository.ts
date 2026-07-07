@@ -31,8 +31,8 @@ export class MysqlUserRepository implements UserRepository {
 
   async create(data: Pick<User, 'nombre' | 'email' | 'password'>): Promise<User> {
     const [result] = await pool.query<ResultSetHeader>(
-      'INSERT INTO users (nombre, email, password) VALUES (?, ?, ?)',
-      [data.nombre, data.email, data.password],
+      'INSERT INTO users (nombre, email, password, rol) VALUES (?, ?, ?, ?)',
+      [data.nombre, data.email, data.password, 'usuario'],
     );
     return (await this.findById(result.insertId)) as User;
   }

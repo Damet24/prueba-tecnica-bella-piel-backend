@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
   nombre VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
+  rol ENUM('usuario', 'admin') DEFAULT 'usuario',
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
   fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   fecha_eliminacion DATETIME NULL

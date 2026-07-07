@@ -4,10 +4,13 @@ import cors from 'cors';
 import httpStatus from 'http-status';
 import http from 'node:http';
 import swaggerUi from 'swagger-ui-express';
-import { register } from './routes/task.routes';
+import { register as registerTaskRoutes } from './routes/task.routes';
+import { register as registerAuthRoutes } from './routes/auth.routes';
+import { register as registerUserRoutes } from './routes/user.routes';
 import { errorHandler } from './controllers/error-handler';
 import { swaggerSpec } from './config/swagger';
 import { env } from './config/env.config';
+import { seedDefaultAdmin } from './database/seed';
 import logger from './config/logger';
 
 export class Server {
@@ -36,7 +39,9 @@ export class Server {
     }
 
     const router = Router();
-    register(router);
+    registerTaskRoutes(router);
+    registerAuthRoutes(router);
+    registerUserRoutes(router);
     this.express.use(router);
 
     router.use((req: Request, res: Response, next: NextFunction) => {
@@ -48,6 +53,7 @@ export class Server {
   }
 
   async listen(): Promise<void> {
+    await seedDefaultAdmin();
     await new Promise<void>((resolve) => {
       this.httpServer = this.express.listen(this.port, () => {
         logger.info(`Server running at http://localhost:${this.port}`);
