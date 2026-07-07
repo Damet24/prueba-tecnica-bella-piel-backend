@@ -3,7 +3,7 @@ import * as bcrypt from 'bcryptjs';
 import { UserService } from '../../src/services/user.service';
 import { UserRepository } from '../../src/domain/repositories/user.repository';
 import { User, PublicUser } from '../../src/domain/user.entity';
-import { TaskNotFoundError, EmailAlreadyExistsError } from '../../src/domain/errors';
+import { TaskNotFoundError, EmailAlreadyExistsError, ForbiddenError } from '../../src/domain/errors';
 
 vi.mock('bcryptjs', () => {
   const hash = vi.fn().mockResolvedValue('$2a$10$hashedpassword');
@@ -35,9 +35,11 @@ function createMockRepo(): UserRepository {
     findAll: vi.fn(),
     findById: vi.fn(),
     findByEmail: vi.fn(),
+    findDeleted: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
     softDelete: vi.fn(),
+    restore: vi.fn(),
   };
 }
 
@@ -155,6 +157,50 @@ describe('UserService', () => {
 
       expect(repo.findByEmail).not.toHaveBeenCalled();
       expect(repo.update).toHaveBeenCalledWith(1, { email: 'test@test.com' });
+    });
+  });
+
+  describe('getDeleted', () => {
+    it('returns deleted users without passwords', async () => {
+      vi.mocked(repo.findDeleted!).mockResolvedValue([mockUser]);
+
+      const result = await service.getDeleted();
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(mockPublicUser);
+      expect(result[0]).not.toHaveProperty('password');
+      expect(repo.findDeleted).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('restore', () => {
+    it('restores user when it is deleted', async () => {
+      vi.mocked(repo.findById!)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(mockUser);
+      vi.mocked(repo.restore!).mockResolvedValue(true);
+
+      const result = await service.restore(1);
+
+      expect(result).toEqual(mockPublicUser);
+      expect(result).not.toHaveProperty('password');
+      expect(repo.findById).toHaveBeenCalledTimes(2);
+      expect(repo.restore).toHaveBeenCalledWith(1);
+    });
+
+    it('throws ForbiddenError when user is not deleted', async () => {
+      vi.mocked(repo.findById!).mockResolvedValue(mockUser);
+
+      await expect(service.restore(1)).rejects.toThrow(ForbiddenError);
+      expect(repo.restore).not.toHaveBeenCalled();
+    });
+
+    it('throws TaskNotFoundError when user does not exist', async () => {
+      vi.mocked(repo.findById!).mockResolvedValue(null);
+      vi.mocked(repo.restore!).mockResolvedValue(false);
+
+      await expect(service.restore(999)).rejects.toThrow(TaskNotFoundError);
+      expect(repo.restore).toHaveBeenCalledWith(999);
     });
   });
 
