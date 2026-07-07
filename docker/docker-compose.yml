@@ -27,7 +27,7 @@ services:
       mysql:
         condition: service_healthy
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       API_VERSION: v1
       DB_HOST: mysql
       DB_PORT: 3306
@@ -35,6 +35,11 @@ services:
       DB_PASSWORD: root
       DB_NAME: task_manager
       PORT: 3000
+      JWT_SECRET: super-secret-key-change-in-production
+      JWT_EXPIRES_IN: 24h
+      DEFAULT_ADMIN_EMAIL: admin@taskmanager.com
+      DEFAULT_ADMIN_PASSWORD: Admin123!
+      DEFAULT_ADMIN_NOMBRE: Administrador
     ports:
       - "3000:3000"
 
