@@ -4,7 +4,9 @@ export interface UserRepository {
   findAll(): Promise<User[]>;
   findById(id: number): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
+  findDeleted(): Promise<User[]>;
   create(data: Pick<User, 'nombre' | 'email' | 'password'>): Promise<User>;
   update(id: number, data: Partial<User>): Promise<User | null>;
   softDelete(id: number): Promise<boolean>;
+  restore(id: number): Promise<boolean>;
 }

@@ -25,6 +25,24 @@ export class UserController {
     }
   };
 
+  getDeleted = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const users = await this.service.getDeleted();
+      res.status(httpStatus.OK).json(users);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  restore = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const user = await this.service.restore(Number(req.params.id));
+      res.status(httpStatus.OK).json(user);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   create = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const user = await this.service.create(req.body);

@@ -53,6 +53,22 @@ export class UserService {
     return this.toPublicUser(updated as User);
   }
 
+  async getDeleted(): Promise<PublicUser[]> {
+    const users = await this.userRepository.findDeleted();
+    return users.map(this.toPublicUser);
+  }
+
+  async restore(id: number): Promise<PublicUser> {
+    const user = await this.userRepository.findById(id);
+    if (user) throw new ForbiddenError(`User with id ${id} is not deleted`);
+
+    const restored = await this.userRepository.restore(id);
+    if (!restored) throw new TaskNotFoundError(`User with id ${id} not found`);
+
+    const result = await this.userRepository.findById(id) as User;
+    return this.toPublicUser(result);
+  }
+
   async delete(id: number): Promise<void> {
     const existing = await this.userRepository.findById(id);
     if (!existing) throw new TaskNotFoundError(`User with id ${id} not found`);

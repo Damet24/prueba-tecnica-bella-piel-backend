@@ -14,8 +14,10 @@ export function register(router: Router): void {
 
   router.use(`${basePath}/users`, authenticate, requireAdmin);
   router.get(`${basePath}/users`, controller.getAll);
+  router.get(`${basePath}/users/deleted`, controller.getDeleted);
   router.get(`${basePath}/users/:id`, controller.getById);
   router.post(`${basePath}/users`, controller.create);
   router.put(`${basePath}/users/:id`, controller.update);
+  router.put(`${basePath}/users/:id/restore`, controller.restore);
   router.delete(`${basePath}/users/:id`, controller.delete);
 }

@@ -61,9 +61,24 @@ export class MysqlUserRepository implements UserRepository {
     return this.findById(id);
   }
 
+  async findDeleted(): Promise<User[]> {
+    const [rows] = await pool.query<UserRow[]>(
+      'SELECT * FROM users WHERE fecha_eliminacion IS NOT NULL ORDER BY fecha_eliminacion DESC',
+    );
+    return rows;
+  }
+
   async softDelete(id: number): Promise<boolean> {
     const [result] = await pool.query<ResultSetHeader>(
       'UPDATE users SET fecha_eliminacion = NOW() WHERE id = ?',
+      [id],
+    );
+    return result.affectedRows > 0;
+  }
+
+  async restore(id: number): Promise<boolean> {
+    const [result] = await pool.query<ResultSetHeader>(
+      'UPDATE users SET fecha_eliminacion = NULL WHERE id = ?',
       [id],
     );
     return result.affectedRows > 0;
